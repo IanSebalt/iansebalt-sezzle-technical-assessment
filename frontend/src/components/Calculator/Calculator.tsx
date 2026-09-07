@@ -1,5 +1,3 @@
-import { useCallback } from 'react'
-
 import { useCalculator } from '../../hooks/useCalculator'
 import { useKeyboard } from '../../hooks/useKeyboard'
 import { formatResult } from '../../lib/calculator/format'
@@ -14,15 +12,12 @@ export function Calculator() {
   const { state, press, isCalculating } = useCalculator()
   useKeyboard(press)
 
-  const isDisabled = useCallback(
-    (id: KeyId) => {
-      if (isCalculating) return id !== 'clear'
-      if (id === 'decimal') return !state.showsResult && state.entry.includes('.')
-      if (id === 'equals') return !isExpressionComplete(state)
-      return false
-    },
-    [isCalculating, state],
-  )
+  const isDisabled = (id: KeyId) => {
+    if (isCalculating) return id !== 'clear'
+    if (id === 'decimal') return !state.showsResult && state.entry.includes('.')
+    if (id === 'equals') return !isExpressionComplete(state)
+    return false
+  }
 
   return (
     <section className={styles.calculator} aria-label="Calculator">
