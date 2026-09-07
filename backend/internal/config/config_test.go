@@ -16,9 +16,6 @@ func TestLoad_UsesDefaultsWhenUnset(t *testing.T) {
 	if cfg.Port != defaultPort {
 		t.Errorf("Port = %d, want %d", cfg.Port, defaultPort)
 	}
-	if cfg.ReadTimeout != readTimeout || cfg.WriteTimeout != writeTimeout || cfg.IdleTimeout != idleTimeout {
-		t.Errorf("timeouts = %v/%v/%v, want the defaults", cfg.ReadTimeout, cfg.WriteTimeout, cfg.IdleTimeout)
-	}
 }
 
 func TestLoad_TreatsAnEmptyPortAsUnset(t *testing.T) {

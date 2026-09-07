@@ -15,7 +15,14 @@ import (
 	"github.com/iansebalt/sezzle-calculator/internal/httpapi"
 )
 
-const shutdownTimeout = 10 * time.Second
+// Timeouts are fixed rather than configurable: nothing in the brief calls for tuning them, and a
+// calculation that needs more than a few seconds is a fault, not a slow client.
+const (
+	readTimeout     = 5 * time.Second
+	writeTimeout    = 10 * time.Second
+	idleTimeout     = 60 * time.Second
+	shutdownTimeout = 10 * time.Second
+)
 
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
@@ -35,9 +42,9 @@ func run(logger *slog.Logger) error {
 	server := &http.Server{
 		Addr:         cfg.Address(),
 		Handler:      httpapi.NewRouter(logger),
-		ReadTimeout:  cfg.ReadTimeout,
-		WriteTimeout: cfg.WriteTimeout,
-		IdleTimeout:  cfg.IdleTimeout,
+		ReadTimeout:  readTimeout,
+		WriteTimeout: writeTimeout,
+		IdleTimeout:  idleTimeout,
 	}
 
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)

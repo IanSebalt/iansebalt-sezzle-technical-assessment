@@ -5,25 +5,20 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"time"
 )
 
-// 8080 is commonly already claimed on a developer machine, so the service defaults to 9080 and
-// stays overridable rather than failing to bind for a reason that is hard to see.
 const (
-	defaultPort  = 9080
-	minPort      = 1
-	maxPort      = 65535
-	readTimeout  = 5 * time.Second
-	writeTimeout = 10 * time.Second
-	idleTimeout  = 60 * time.Second
+	// 8080 is commonly already claimed on a developer machine, so the service defaults to 9080 and
+	// stays overridable rather than failing to bind for a reason that is hard to see.
+	defaultPort = 9080
+
+	minPort = 1
+	maxPort = 65535
 )
 
+// Config holds every setting the environment can supply.
 type Config struct {
-	Port         int
-	ReadTimeout  time.Duration
-	WriteTimeout time.Duration
-	IdleTimeout  time.Duration
+	Port int
 }
 
 // Address renders the listen address for net/http.
@@ -41,12 +36,7 @@ func Load() (Config, error) {
 		return Config{}, fmt.Errorf("PORT must be between %d and %d, got %d", minPort, maxPort, port)
 	}
 
-	return Config{
-		Port:         port,
-		ReadTimeout:  readTimeout,
-		WriteTimeout: writeTimeout,
-		IdleTimeout:  idleTimeout,
-	}, nil
+	return Config{Port: port}, nil
 }
 
 func intFromEnv(key string, fallback int) (int, error) {
