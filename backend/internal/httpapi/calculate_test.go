@@ -301,3 +301,27 @@ func TestCalculate_BodyTooLarge(t *testing.T) {
 
 	assertAPIError(t, post(t, oversized), http.StatusRequestEntityTooLarge, apierror.CodePayloadTooLarge)
 }
+
+// JSON tolerates leading whitespace, so the body can be padded to an exact byte count.
+func paddedBody(size int) string {
+	body := `{"operation":"add","a":1,"b":2}`
+	return strings.Repeat(" ", size-len(body)) + body
+}
+
+func TestCalculate_BodyLimitBoundary(t *testing.T) {
+	const limit = 4 << 10
+
+	t.Run("exactly at the limit is accepted", func(t *testing.T) {
+		rec := post(t, paddedBody(limit))
+
+		if rec.Code != http.StatusOK {
+			t.Errorf("status = %d, want 200 for a body of exactly %d bytes", rec.Code, limit)
+		}
+	})
+
+	t.Run("one byte over the limit is rejected", func(t *testing.T) {
+		rec := post(t, paddedBody(limit+1))
+
+		assertAPIError(t, rec, http.StatusRequestEntityTooLarge, apierror.CodePayloadTooLarge)
+	})
+}

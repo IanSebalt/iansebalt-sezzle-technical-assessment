@@ -34,6 +34,22 @@ describe('Display', () => {
     expect(screen.getByRole('status')).toHaveAttribute('data-size', 'small')
   })
 
+  it('steps down exactly at the length thresholds', () => {
+    const sizes = [
+      { length: 10, want: 'normal' },
+      { length: 11, want: 'medium' },
+      { length: 14, want: 'medium' },
+      { length: 15, want: 'small' },
+    ]
+
+    for (const { length, want } of sizes) {
+      const { unmount } = render(<Display expression="" value={'9'.repeat(length)} busy={false} />)
+
+      expect(screen.getByRole('status'), `length ${length}`).toHaveAttribute('data-size', want)
+      unmount()
+    }
+  })
+
   it('marks itself busy while a calculation is in flight', () => {
     const { rerender } = render(<Display expression="" value="7" busy={false} />)
     expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'false')
