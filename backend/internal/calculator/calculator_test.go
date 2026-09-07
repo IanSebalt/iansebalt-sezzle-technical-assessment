@@ -90,6 +90,37 @@ func TestEvaluate_Percentage(t *testing.T) {
 	}
 }
 
+func TestEvaluate_PercentageIsExactForCommonValues(t *testing.T) {
+	tests := []struct {
+		name string
+		a, b float64
+		want float64
+	}{
+		{name: "7% of 3", a: 7, b: 3, want: 0.21},
+		{name: "3% of 7", a: 3, b: 7, want: 0.21},
+		{name: "5% of 3", a: 5, b: 3, want: 0.15},
+		{name: "20% of 55", a: 20, b: 55, want: 11},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got, err := Evaluate(Percentage, tt.a, tt.b)
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != tt.want {
+				t.Errorf("Evaluate(percentage, %v, %v) = %v, want exactly %v", tt.a, tt.b, got, tt.want)
+			}
+		})
+	}
+}
+
+func TestEvaluate_PercentageRejectsAnOverflowingProduct(t *testing.T) {
+	if _, err := Evaluate(Percentage, 1e308, 1e308); !errors.Is(err, ErrNonFiniteResult) {
+		t.Error("an overflowing percentage should be reported, not silently returned")
+	}
+}
+
 func TestEvaluate_PowerEdgeCases(t *testing.T) {
 	tests := []struct {
 		name string

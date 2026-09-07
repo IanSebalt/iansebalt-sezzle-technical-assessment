@@ -39,7 +39,9 @@ func apply(op Operation, a, b float64) (float64, error) {
 		}
 		return math.Sqrt(a), nil
 	case Percentage:
-		return a / 100 * b, nil
+		// Multiplying before dividing keeps common cases exact: 7% of 3 is 0.21, where dividing
+		// first yields 0.21000000000000002. The finite guard catches the products that overflow.
+		return a * b / 100, nil
 	default:
 		return 0, ErrUnsupportedOperation
 	}

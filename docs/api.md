@@ -31,7 +31,7 @@ instead of being read as a missing field. The body is capped at 4 KiB.
 | `divide` | a, b | a ÷ b | b = 0 |
 | `power` | a, b | a ^ b | — |
 | `sqrt` | a | √a | a < 0 |
-| `percentage` | a, b | (a ÷ 100) × b — **"a% of b"** | — |
+| `percentage` | a, b | (a × b) ÷ 100 — **"a% of b"** | — |
 
 Every operation additionally rejects a result that is not a finite number (overflow to ±∞, or an
 undefined result such as `power(-8, 1/3)`), because neither is expressible in JSON.

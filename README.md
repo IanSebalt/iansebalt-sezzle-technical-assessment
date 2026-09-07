@@ -75,7 +75,7 @@ make up / make down    # Docker Compose stack
 | `divide` | a, b | a ÷ b — rejects b = 0 |
 | `power` | a, b | a ^ b |
 | `sqrt` | a | √a — rejects a < 0; `b` is ignored if sent |
-| `percentage` | a, b | (a ÷ 100) × b, i.e. **"a% of b"** — `15 % 200 = 30` |
+| `percentage` | a, b | (a × b) ÷ 100, i.e. **"a% of b"** — `15 % 200 = 30` |
 
 The keypad evaluates **one binary operation per `=`**: type a number, choose an operator, type the
 second number, press `=`. The operator can be changed at any point before `=`. `√` applies to the
