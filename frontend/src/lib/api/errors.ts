@@ -15,11 +15,11 @@ export class ApiError extends Error {
     this.status = status
   }
 
-  static network(): ApiError {
+  static network(status = 0): ApiError {
     return new ApiError(
       CLIENT_ERROR_CODES.network,
       'Cannot reach the calculator service. Check your connection and try again.',
-      0,
+      status,
     )
   }
 

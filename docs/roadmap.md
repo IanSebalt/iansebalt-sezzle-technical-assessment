@@ -1,5 +1,10 @@
 # Roadmap — Sezzle Full-Stack Calculator
 
+> **Status: complete.** All nine phases landed, each as its own commit. Figures and outcomes are in
+> [`coverage.md`](coverage.md); the contract is in [`api.md`](api.md) and the reasoning in
+> [`architecture.md`](architecture.md). The record below is kept as built, with the deferred
+> decisions resolved at the bottom.
+
 ## Context
 
 `docs/main-task/main-task.txt` asks for a full-stack calculator: a React (TypeScript) frontend
@@ -173,6 +178,7 @@ of `errmap.go`.
 | `MALFORMED_JSON` | 400 | Request body must be a valid JSON object. | `dto.go` — syntax error, EOF, trailing data |
 | `UNKNOWN_FIELD` | 400 | Request contains an unrecognised field. Expected: operation, a, b. | `dto.go` — `DisallowUnknownFields` |
 | `MISSING_OPERATION` | 400 | Field "operation" is required. | `dto.go` — nil `*string` |
+| `INVALID_OPERATION` | 400 | Field "operation" must be text. | `dto.go` — added in Phase 2: a non-string `operation` is neither malformed JSON nor an unsupported operation |
 | `INVALID_OPERAND` | 400 | Operands "a" and "b" must be finite numbers. | `dto.go` — `*json.UnmarshalTypeError` (covers `"ten"`, `true`, `1e400`) |
 | `MISSING_OPERAND` | 400 | This operation requires two numbers (a and b). | `calculate.go` — nil `*float64` while arity is 2 |
 | `UNSUPPORTED_OPERATION` | 400 | Unsupported operation. Use one of: add, subtract, multiply, divide, power, sqrt, percentage. | domain `ParseOperation`, mapped in `errmap.go` |
@@ -200,68 +206,68 @@ flight · hint line *Maximum 15 digits.* when the entry cap is reached.
 Each phase ends in a committable, verifiable state.
 
 **Phase 0 — Workspace scaffold**
-- [ ] Extend `.gitignore`; add `.editorconfig`
-- [ ] `Makefile` with `help`, `test`, `coverage`, `run-backend`, `run-frontend`, `fmt`, `lint`
-- [ ] `README.md` skeleton; `docs/roadmap.md` (this plan) + `api.md` / `architecture.md` / `coverage.md` placeholders
-- [ ] Verify `make help`
-- [ ] `chore(repo): scaffold workspace, makefile and docs skeleton`
+- [x] Extend `.gitignore`; add `.editorconfig`
+- [x] `Makefile` with `help`, `test`, `coverage`, `run-backend`, `run-frontend`, `fmt`, `lint`
+- [x] `README.md` skeleton; `docs/roadmap.md` (this plan) + `api.md` / `architecture.md` / `coverage.md` placeholders
+- [x] Verify `make help`
+- [x] `chore(repo): scaffold workspace, makefile and docs skeleton`
 
 **Phase 1 — Backend domain**
-- [ ] `backend/go.mod` (no requires)
-- [ ] `internal/calculator/{operation,errors,calculator}.go`
-- [ ] Table-driven tests: all 7 operations + every domain error path
-- [ ] Verify `go test ./internal/calculator/... -cover` (target 100%)
-- [ ] `feat(calculator): add domain operations with table-driven tests`
+- [x] `backend/go.mod` (no requires)
+- [x] `internal/calculator/{operation,errors,calculator}.go`
+- [x] Table-driven tests: all 7 operations + every domain error path
+- [x] Verify `go test ./internal/calculator/... -cover` (target 100%)
+- [x] `feat(calculator): add domain operations with table-driven tests`
 
 **Phase 2 — Error contract + HTTP transport**
-- [ ] `internal/apierror/{apierror,catalog}.go` implementing the full catalogue
-- [ ] `internal/httpapi/{dto,errmap,render,calculate,middleware,router}.go`
-- [ ] Black-box `httptest` tests for every catalogue row + all 7 success shapes
-- [ ] Verify `go test ./... -cover`; every error code asserted at least once
-- [ ] `feat(api): add http transport and error catalogue for calculate endpoint`
+- [x] `internal/apierror/{apierror,catalog}.go` implementing the full catalogue
+- [x] `internal/httpapi/{dto,errmap,render,calculate,middleware,router}.go`
+- [x] Black-box `httptest` tests for every catalogue row + all 7 success shapes
+- [x] Verify `go test ./... -cover`; every error code asserted at least once
+- [x] `feat(api): add http transport and error catalogue for calculate endpoint`
 
 **Phase 3 — Server wiring**
-- [ ] `internal/config` (+ test): `PORT` default 9080, timeouts
-- [ ] `cmd/server/main.go`: slog, server timeouts, `signal.NotifyContext` graceful shutdown
-- [ ] Verify `make run-backend` + curl every documented example (success, 422, 405, 415, 413)
-- [ ] `feat(server): wire configurable http server with graceful shutdown`
+- [x] `internal/config` (+ test): `PORT` default 9080, timeouts
+- [x] `cmd/server/main.go`: slog, server timeouts, `signal.NotifyContext` graceful shutdown
+- [x] Verify `make run-backend` + curl every documented example (success, 422, 405, 415, 413)
+- [x] `feat(server): wire configurable http server with graceful shutdown`
 
 **Phase 4 — Frontend scaffold + API client**
-- [ ] Vite React-TS app, strict tsconfig, CSS Modules, `styles/{tokens,global}.css`
-- [ ] Vitest + RTL config, `src/tests/setup.ts`, dev proxy `/api → localhost:9080`
-- [ ] `lib/api/{types,errors,client}.ts` + client tests
-- [ ] Verify `npm run typecheck && npm test`
-- [ ] `feat(web): scaffold vite app and typed calculate api client`
+- [x] Vite React-TS app, strict tsconfig, CSS Modules, `styles/{tokens,global}.css`
+- [x] Vitest + RTL config, `src/tests/setup.ts`, dev proxy `/api → localhost:9080`
+- [x] `lib/api/{types,errors,client}.ts` + client tests
+- [x] Verify `npm run typecheck && npm test`
+- [x] `feat(web): scaffold vite app and typed calculate api client`
 
 **Phase 5 — Keypad state machine + hooks**
-- [ ] `lib/calculator/{keypadTypes,keys,keypadReducer,format}.ts` — pure, no React, no fetch
-- [ ] `hooks/useCalculator.ts` (reducer + effect on `pending`, AbortController + stale-response guard)
-- [ ] `hooks/useKeyboard.ts` driven by the same `keys.ts` bindings
-- [ ] Verify reducer/format/hook tests green, reducer coverage ≥ 95%
-- [ ] `feat(web): add keypad state machine and calculator hook`
+- [x] `lib/calculator/{keypadTypes,keys,keypadReducer,format}.ts` — pure, no React, no fetch
+- [x] `hooks/useCalculator.ts` (reducer + effect on `pending`, AbortController + stale-response guard)
+- [x] `hooks/useKeyboard.ts` driven by the same `keys.ts` bindings
+- [x] Verify reducer/format/hook tests green, reducer coverage ≥ 95%
+- [x] `feat(web): add keypad state machine and calculator hook`
 
 **Phase 6 — UI components**
-- [ ] `Key`, `Keypad`, `Display`, `ErrorBanner`, `Calculator`, `App` + CSS Modules
-- [ ] Responsive grid, ≥44px touch targets, `aria-live` / `role="alert"`, visible focus
-- [ ] Hints row: *√ applies to the number shown* · *a % b = a% of b*
-- [ ] Component + integration tests with stubbed `fetch`
-- [ ] Verify `npm test`, manual mobile-width check, full keyboard-only run
-- [ ] `feat(web): add keypad calculator ui with accessible error messaging`
+- [x] `Key`, `Keypad`, `Display`, `ErrorBanner`, `Calculator`, `App` + CSS Modules
+- [x] Responsive grid, ≥44px touch targets, `aria-live` / `role="alert"`, visible focus
+- [x] Hints row: *√ applies to the number shown* · *a % b = a% of b*
+- [x] Component + integration tests with stubbed `fetch`
+- [x] Verify `npm test`, manual mobile-width check, full keyboard-only run
+- [x] `feat(web): add keypad calculator ui with accessible error messaging`
 
 **Phase 7 — Docker**
-- [ ] `backend/Dockerfile` (distroless static, nonroot, `CGO_ENABLED=0 -trimpath -ldflags="-s -w"`)
-- [ ] `frontend/{Dockerfile,nginx.conf}` (SPA fallback + `/api/` → `backend:9080`)
-- [ ] `docker-compose.yml`, `.dockerignore` per context
-- [ ] Verify `docker compose up --build`, exercise the UI and a direct curl
-- [ ] `chore(docker): add multi-stage images and compose stack`
+- [x] `backend/Dockerfile` (distroless static, nonroot, `CGO_ENABLED=0 -trimpath -ldflags="-s -w"`)
+- [x] `frontend/{Dockerfile,nginx.conf}` (SPA fallback + `/api/` → `backend:9080`)
+- [x] `docker-compose.yml`, `.dockerignore` per context
+- [x] Verify `docker compose up --build`, exercise the UI and a direct curl
+- [x] `chore(docker): add multi-stage images and compose stack`
 
 **Phase 8 — Coverage + documentation**
-- [ ] `make coverage` → `go tool cover -func` totals + Vitest v8 summary
-- [ ] `docs/coverage.md` with real per-package numbers, date, reproduction commands
-- [ ] `docs/api.md` (contract + curl per operation + catalogue); `docs/architecture.md` (layering, error mapping, state machine)
-- [ ] `README.md`: quickstart (local + docker), API examples, keyboard map, design decisions, explicit non-goals
-- [ ] Tick every box in `docs/roadmap.md`
-- [ ] `docs(repo): add api reference, architecture notes and coverage report`
+- [x] `make coverage` → `go tool cover -func` totals + Vitest v8 summary
+- [x] `docs/coverage.md` with real per-package numbers, date, reproduction commands
+- [x] `docs/api.md` (contract + curl per operation + catalogue); `docs/architecture.md` (layering, error mapping, state machine)
+- [x] `README.md`: quickstart (local + docker), API examples, keyboard map, design decisions, explicit non-goals
+- [x] Tick every box in `docs/roadmap.md`
+- [x] `docs(repo): add api reference, architecture notes and coverage report`
 
 ---
 
@@ -308,31 +314,35 @@ pressing Enter submits · Escape clears · √ of a negative shows the domain er
 
 ---
 
-## Deferred decisions
+## Deferred decisions — resolved
 
-Flagged rather than settled, per your instruction — each has a working default and a revisit point.
+Each was left open deliberately and settled at the point the roadmap named.
 
-| Decision | Default until revisited | Revisit at |
+| Decision | Resolved as | Where |
 |---|---|---|
-| `GET /api/v1/health` endpoint | Omit — outside the agreed single-endpoint spec | Phase 7, only if a compose healthcheck is wanted (distroless has no curl, so it needs a Go probe) |
-| Per-request access logging | Log 5xx and panics only | Phase 3, after seeing whether local debugging needs it |
-| Coverage thresholds gating `make coverage` | Report only, no gate | Phase 8, once real numbers exist |
-| Display precision policy | 12 significant digits, exponential outside `[1e-9, 1e12)` | Phase 5, when real server outputs land in `format.test.ts` |
-| MSW vs. `vi.stubGlobal('fetch')` | Stubbed fetch, no extra dependency | Phase 6, only if component tests get noisy |
-| `UNKNOWN_FIELD` as its own code | On, with `DisallowUnknownFields` | Phase 2, while writing `dto_test.go` — fold into `MALFORMED_JSON` if the copy feels unhelpful |
-| Dark mode depth | `prefers-color-scheme` tokens only | Phase 6, time permitting |
-| Published compose host ports | web `8081:80`, backend `9080:9080` | Phase 7, after checking what is free |
-| `b: null` vs. omitted for `sqrt` responses | Omitted via `omitempty` | Phase 2, confirmed when the TS contract types are written in Phase 4 |
+| `GET /api/v1/health` endpoint | **Omitted.** No compose healthcheck was added, so nothing needed it; distroless carries no shell to probe with | Phase 7 |
+| Per-request access logging | **5xx and panics only.** Local debugging never needed more | Phase 3 |
+| Coverage thresholds gating `make coverage` | **Report only, no gate.** The figures are committed instead | Phase 8 |
+| Display precision policy | **12 significant digits, trailing zeros trimmed.** The explicit exponential thresholds were *deleted* — `toPrecision(12)` already switches notation at exactly the right magnitudes, so they were duplicated logic | Phase 5 |
+| MSW vs. stubbed `fetch` | **Stubbed `fetch`**, plus a `stubBackend` helper that replies the way the Go service does. No extra dependency, and component tests stayed readable | Phase 6 |
+| `UNKNOWN_FIELD` as its own code | **Kept**, and `INVALID_OPERATION` was added alongside it. Folding them into `MALFORMED_JSON` would have told a user with a typo'd field name nothing useful | Phase 2 |
+| Dark mode depth | **`prefers-color-scheme` tokens only.** Verified in both themes in a real browser | Phase 6 |
+| Published compose host ports | **web `8081:80`, backend `9080:9080`** — both confirmed free | Phase 7 |
+| `b: null` vs. omitted for `sqrt` | **Omitted** via `omitempty`, with a test asserting the key is absent rather than null | Phase 2 |
+
+### Decided during implementation, beyond the original plan
+
+| Decision | Outcome |
+|---|---|
+| Linter | The Vite template ships **oxlint**, not ESLint. Kept it — one less dependency and it is the template default, so `eslint.config.js` from the plan does not exist |
+| A whole-body JSON type mismatch | A body like `[1,2]` produced `Field "" must be a number…`. Now reported as `MALFORMED_JSON`, which is what it actually is |
+| Long results overflowing the display | `99^99` clipped its own exponent. The display now steps its type size down by value length (`data-size` attribute, asserted in a test) |
+| `cmd/server` test coverage | The plan left the entrypoint untested. It now has a test that boots the real server on an ephemeral port, calls it, sends `SIGTERM` and asserts a clean shutdown |
+| A downed backend behind a proxy | Found by killing the backend with the page open: Vite (and nginx) answer **502**, so the browser gets a response rather than a failed fetch, and the user was told "Unexpected response from the server." 502/503/504 now map to "Cannot reach the calculator service." |
 
 **Explicit non-goals** (documented in the README, not deferred): CORS middleware (dev uses the Vite
 proxy, prod is same-origin via nginx), auth, rate limiting, persistence or history, E2E tests,
 arbitrary-precision arithmetic.
-
-**One process note:** your global `CLAUDE.md` points task tracking at `tasks/todo.md`, but you asked
-for the roadmap in `docs/`. I'll keep `docs/roadmap.md` as the single source of truth and skip
-`tasks/todo.md` to avoid two diverging checklists — say the word if you'd rather have both.
-
----
 
 ## Verification
 

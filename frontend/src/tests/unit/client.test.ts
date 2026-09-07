@@ -53,7 +53,7 @@ describe('calculate', () => {
   })
 
   it('falls back to a readable message when an error body is not the documented envelope', async () => {
-    stubTextResponse('<html>502 Bad Gateway</html>', 502)
+    stubTextResponse('<html>500 Internal Server Error</html>', 500)
 
     const error = await calculate({ operation: 'add', a: 1, b: 2 }).catch((cause) => cause)
 
@@ -76,6 +76,17 @@ describe('calculate', () => {
     const error = await calculate({ operation: 'add', a: 1, b: 2 }).catch((cause) => cause)
 
     expect(error.code).toBe(CLIENT_ERROR_CODES.unreadable)
+  })
+
+  it('reports the service as unreachable when a proxy cannot reach it', async () => {
+    for (const status of [502, 503, 504]) {
+      stubTextResponse('<html>Bad Gateway</html>', status)
+
+      const error = await calculate({ operation: 'add', a: 1, b: 2 }).catch((cause) => cause)
+
+      expect(error.code, `status ${status}`).toBe(CLIENT_ERROR_CODES.network)
+      expect(error.status).toBe(status)
+    }
   })
 
   it('reports a network failure when fetch rejects', async () => {

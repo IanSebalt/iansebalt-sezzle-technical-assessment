@@ -3,6 +3,11 @@ import type { ApiErrorBody, CalculateRequest, CalculateResponse } from './types'
 
 const CALCULATE_ENDPOINT = '/api/v1/calculate'
 
+// A proxy sits in front of the API in both dev (Vite) and production (nginx). When the backend is
+// down the browser gets one of these from the proxy, not a failed fetch, so they mean the same
+// thing to a user: the calculator service could not be reached.
+const GATEWAY_FAILURES = new Set([502, 503, 504])
+
 /**
  * Every failure leaves here as an ApiError carrying a message fit to show a user, so callers never
  * have to interpret a status code. Aborts are the one exception: they are the caller's own doing.
@@ -28,8 +33,11 @@ export async function calculate(
   const body: unknown = await response.json().catch(() => null)
 
   if (!response.ok) {
-    throw isApiErrorBody(body)
-      ? new ApiError(body.error.code, body.error.message, response.status)
+    if (isApiErrorBody(body)) {
+      throw new ApiError(body.error.code, body.error.message, response.status)
+    }
+    throw GATEWAY_FAILURES.has(response.status)
+      ? ApiError.network(response.status)
       : ApiError.unreadable(response.status)
   }
 
