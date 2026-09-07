@@ -15,9 +15,9 @@ export default function App() {
 
       <footer className={styles.footer}>
         <p>
-          Keyboard: digits and <kbd>.</kbd>, <kbd>+</kbd> <kbd>−</kbd> <kbd>*</kbd> <kbd>/</kbd>{' '}
-          <kbd>^</kbd> <kbd>%</kbd>, <kbd>r</kbd> for √, <kbd>Enter</kbd> to calculate and{' '}
-          <kbd>Esc</kbd> to clear.
+          Keyboard: digits and <kbd>.</kbd>, <kbd>+</kbd> <kbd>-</kbd> <kbd>*</kbd> <kbd>/</kbd>{' '}
+          <kbd>^</kbd> <kbd>%</kbd>, <kbd>r</kbd> for √, <kbd>Enter</kbd> to calculate,{' '}
+          <kbd>Backspace</kbd> to delete a digit and <kbd>Esc</kbd> or <kbd>c</kbd> to clear.
         </p>
       </footer>
     </div>

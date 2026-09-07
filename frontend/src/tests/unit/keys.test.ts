@@ -47,6 +47,18 @@ describe('key definitions', () => {
     expect(keyIdForKeyboardKey('F5')).toBeUndefined()
   })
 
+  it('binds every stroke the app documents', () => {
+    const documented = [
+      '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.',
+      '+', '-', '*', 'x', '/', '^', '%', 'r',
+      'Enter', '=', 'Backspace', 'Escape', 'c',
+    ]
+
+    for (const stroke of documented) {
+      expect(keyIdForKeyboardKey(stroke), `stroke ${stroke}`).toBeDefined()
+    }
+  })
+
   it('exposes labels for rendering an expression', () => {
     expect(keyLabel('divide')).toBe('÷')
     expect(keyLabel('multiply')).toBe('×')

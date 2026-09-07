@@ -81,8 +81,20 @@ The keypad evaluates **one binary operation per `=`**: type a number, choose an 
 second number, press `=`. The operator can be changed at any point before `=`. `√` applies to the
 number currently shown and leaves a half-built expression intact, so `9 + 16 √ =` gives 13.
 
-**Keyboard:** digits and `.`, the operators `+ − * / ^ %`, `r` for `√`, `Enter` to calculate, `Esc`
-to clear. The whole app is usable by keyboard alone.
+The whole app is usable by keyboard alone:
+
+| Key | Does |
+|---|---|
+| `0`–`9`, `.` | Enter a number |
+| `+`, `-`, `*` (or `x`), `/` | Add, subtract, multiply, divide |
+| `^` | Exponentiation |
+| `%` | Percentage |
+| `r` | Square root |
+| `Enter` or `=` | Calculate |
+| `Backspace` | Delete the last digit |
+| `Esc` or `c` | Clear |
+
+Letter keys are case-insensitive.
 
 ## API
 
