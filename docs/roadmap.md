@@ -63,93 +63,101 @@ error codes, or user-facing copy.
 
 ```
 / (repo root)
-├── .gitignore                     # + node_modules, dist, coverage, *.out, bin/
+├── .gitignore
 ├── .editorconfig                  # shared indentation/EOL for Go + TS
 ├── Makefile                       # single entry point: test / coverage / run / docker
-├── README.md                      # setup, run, API examples, design decisions, keyboard map
+├── README.md                      # setup, run, API examples, design decisions
 ├── docker-compose.yml             # backend + nginx-served frontend
 │
 ├── docs/
 │   ├── main-task/main-task.txt    # (existing) original brief
-│   ├── roadmap.md                 # this roadmap, committed, checkboxes ticked as phases land
+│   ├── roadmap.md                 # this document — the plan, as built
 │   ├── api.md                     # endpoint contract, curl per operation, full error catalogue
 │   ├── architecture.md            # layering, error mapping, keypad state machine rationale
 │   └── coverage.md                # real coverage numbers + how to reproduce
 │
 ├── backend/
-│   ├── go.mod                     # module github.com/iansebalt/sezzle-calculator, go 1.27, zero requires
+│   ├── go.mod                     # module github.com/iansebalt/sezzle-calculator, go 1.22, zero requires
 │   ├── Dockerfile                 # multi-stage: golang builder → distroless/static:nonroot
 │   ├── .dockerignore
-│   ├── cmd/server/main.go         # config → router → http.Server → graceful shutdown
+│   ├── cmd/server/
+│   │   ├── main.go                # config → router → http.Server → graceful shutdown
+│   │   └── main_test.go           # boots the server, calls it, SIGTERMs it
 │   └── internal/
 │       ├── config/
-│       │   ├── config.go          # env parsing: PORT (default 9080), read/write/idle timeouts
+│       │   ├── config.go          # PORT only (default 9080); timeouts live in cmd/server
 │       │   └── config_test.go
 │       ├── calculator/            # pure domain, zero transport knowledge
 │       │   ├── operation.go       # Operation type, 7 constants, ParseOperation, Arity
 │       │   ├── calculator.go      # Evaluate(op, a, b) dispatch + finite-result guard
-│       │   ├── errors.go          # sentinels: ErrUnsupportedOperation, ErrDivisionByZero,
-│       │   │                      #   ErrNegativeSquareRoot, ErrNonFiniteResult
+│       │   ├── errors.go          # the four domain sentinels
 │       │   ├── operation_test.go
 │       │   └── calculator_test.go
 │       ├── apierror/              # the wire error contract — single source of truth
-│       │   ├── apierror.go        # type Error{Status int; Code, Message string}
+│       │   ├── apierror.go        # type Error{Status, Code, Message} + error interface
 │       │   ├── catalog.go         # one constructor per catalogue entry
 │       │   └── apierror_test.go   # invariants: unique codes, non-empty copy, sane statuses
 │       └── httpapi/               # HTTP transport only
+│           ├── api.go             # package doc + the api struct the handlers hang off
 │           ├── router.go          # "POST /api/v1/calculate" + 405/404 fallbacks + middleware
 │           ├── calculate.go       # handler: decode → parse → evaluate → render
 │           ├── dto.go             # request/response structs + decodeRequest
 │           ├── errmap.go          # domain error → *apierror.Error   ← the ONLY mapping point
 │           ├── render.go          # writeJSON / writeError (always the {"error":{…}} envelope)
-│           ├── middleware.go      # recoverPanic → 500, logs via slog
+│           ├── middleware.go      # recoverPanic + the trackingWriter it needs
+│           ├── calculate_test.go  # package httpapi_test (black-box)
 │           ├── router_test.go     # package httpapi_test (black-box)
-│           ├── calculate_test.go  # package httpapi_test
-│           ├── dto_test.go        # package httpapi_test
-│           └── errmap_test.go     # package httpapi (white-box, unexported mapError)
+│           ├── dto_test.go        # package httpapi (white-box)
+│           ├── errmap_test.go     # package httpapi (white-box)
+│           ├── middleware_test.go # package httpapi (white-box)
+│           └── render_test.go     # package httpapi (white-box)
 │
 └── frontend/
     ├── package.json               # dev, build, preview, test, test:coverage, lint, typecheck
-    ├── tsconfig.json              # strict: true, noUncheckedIndexedAccess
-    ├── tsconfig.node.json
+    ├── package-lock.json
+    ├── tsconfig.json              # project references
+    ├── tsconfig.app.json          # src: strict, noUncheckedIndexedAccess
+    ├── tsconfig.node.json         # vite.config.ts
     ├── vite.config.ts             # React plugin, dev proxy /api → localhost:9080, vitest block
-    ├── eslint.config.js
+    ├── .oxlintrc.json             # oxlint ships with the Vite template in place of ESLint
+    ├── .gitignore
     ├── index.html
-    ├── nginx.conf                 # SPA fallback + proxy_pass /api/ → backend:9080
+    ├── nginx.conf                 # SPA fallback + /api/ proxy to backend:9080 + timeouts
     ├── Dockerfile                 # multi-stage: node builder → nginx:alpine
     ├── .dockerignore
     ├── public/favicon.svg
     └── src/
         ├── main.tsx
-        ├── App.tsx                # page shell: header, <Calculator/>, hints footer
+        ├── App.tsx                # page shell: header, <Calculator/>, keyboard legend
         ├── App.module.css
         ├── styles/
-        │   ├── tokens.css         # CSS custom properties: color, spacing, radii, key sizes
-        │   └── global.css         # reset, base type, focus-visible, prefers-color-scheme
+        │   ├── tokens.css         # CSS custom properties, light and dark
+        │   └── global.css         # reset, base type, focus-visible, reduced motion
         ├── components/            # one folder per component, styles beside it
         │   ├── Calculator/        # composes the hooks + Display/Keypad/ErrorBanner
-        │   ├── Display/           # expression line + current value, aria-live="polite"
-        │   ├── Keypad/            # renders the grid from keys.ts, forwards presses
-        │   ├── Key/               # single <button>: label, aria-label, disabled/pressed
+        │   ├── Display/           # expression line + current value, aria-live
+        │   ├── Keypad/            # renders the grid from keys.ts
+        │   ├── Key/               # single <button>
         │   └── ErrorBanner/       # role="alert" message area
         ├── hooks/
-        │   ├── useCalculator.ts   # useReducer + effect on state.pending → API, abort/stale guard
+        │   ├── useCalculator.ts   # reducer + effect on pending, abort/stale guard
         │   └── useKeyboard.ts     # window keydown → KeyId via keys.ts bindings
         ├── lib/
         │   ├── api/
-        │   │   ├── types.ts       # CalculateRequest/Response, ApiErrorBody (mirrors the Go DTOs)
-        │   │   ├── errors.ts      # ApiError class + network/parse fallbacks
-        │   │   └── client.ts      # calculate(req, signal) → Response | throws ApiError
+        │   │   ├── types.ts       # CalculateRequest/Response, ApiErrorBody
+        │   │   ├── errors.ts      # ApiError + network/parse fallbacks
+        │   │   └── client.ts      # calculate(req, signal), 10s deadline
         │   └── calculator/
         │       ├── keypadTypes.ts # KeyId, Operator, State, Action, PendingRequest
         │       ├── keys.ts        # key layout + labels + keyboard bindings (single source)
         │       ├── keypadReducer.ts # PURE state machine — no React, no fetch, no arithmetic
         │       └── format.ts      # display formatting + digit-entry constraints
         └── tests/                 # all frontend tests, mirrored by layer
-            ├── setup.ts           # RTL cleanup, jest-dom matchers, fetch stub helper
+            ├── setup.ts           # RTL cleanup, jest-dom matchers
+            ├── fetchStub.ts       # fetch stubbing helpers, incl. a backend-shaped responder
             ├── unit/              # keypadReducer, format, keys, client
-            ├── hooks/             # useCalculator
-            └── components/        # Display, Key, Keypad, Calculator
+            ├── hooks/             # useCalculator, useKeyboard
+            └── components/        # App, Calculator, Display, Key, Keypad
 ```
 
 The API client targets the relative path `/api/v1/calculate` — same-origin in both dev (Vite proxy)
@@ -340,6 +348,33 @@ Each was left open deliberately and settled at the point the roadmap named.
 | `cmd/server` test coverage | The plan left the entrypoint untested. It now has a test that boots the real server on an ephemeral port, calls it, sends `SIGTERM` and asserts a clean shutdown |
 | A downed backend behind a proxy | Found by killing the backend with the page open: Vite (and nginx) answer **502**, so the browser gets a response rather than a failed fetch, and the user was told "Unexpected response from the server." 502/503/504 now map to "Cannot reach the calculator service." |
 | How long a dead backend takes to report | With default timeouts nginx took **39s** to return its 502, leaving the keypad disabled throughout. `proxy_connect_timeout 5s` plus a 10s client deadline bring it to ~5s, and the keypad recovers |
+
+### Structural deviations from the planned tree
+
+The tree above is the final structure. It differs from the originally approved plan as follows.
+
+| Plan | As built | Why |
+|---|---|---|
+| `frontend/eslint.config.js` | `frontend/.oxlintrc.json` | The Vite template ships oxlint; adding ESLint would have meant two linters |
+| `frontend/.env.example` (`VITE_API_BASE_URL`) | dropped | The client uses a relative `/api/v1` path, same-origin under both the Vite proxy and nginx, so there is nothing to configure |
+| `frontend/tsconfig.json` + `tsconfig.node.json` | plus `tsconfig.app.json` | The template splits app and tooling configs; `strict` and `noUncheckedIndexedAccess` were added to the app one |
+| fetch stub helper inside `tests/setup.ts` | `tests/fetchStub.ts` | `setup.ts` runs for side effects; importable helpers belong in their own module |
+| `httpapi` handlers only | plus `httpapi/api.go` | Holds the package doc and the `api` struct the handlers hang off, so no single handler file owns it |
+| `dto_test.go` as `package httpapi_test` | `package httpapi` | It exercises `decodeCalculateRequest` and `decodeError` directly, which are unexported |
+| four `httpapi` test files | plus `middleware_test.go`, `render_test.go` | Panic recovery and the JSON writer needed their own white-box tests to reach 100% |
+| frontend component tests | plus `tests/components/App.test.tsx` | The page shell was otherwise never rendered |
+| `cmd/server` untested | `cmd/server/main_test.go` | Boots the real server on an ephemeral port, calls it, and asserts a clean `SIGTERM` shutdown |
+
+### Changes made after the post-implementation review
+
+| Change | Why |
+|---|---|
+| `KeypadState.entryValue` added | The display string is rounded to 12 significant digits; re-parsing it fed that rounding into the next request, so `10 ÷ 3 = × 3 =` returned `9.99999999999` |
+| Keypad grew a `⌫` key; `=` spans the final row | There was no way to correct a mistyped digit, and `Backspace` was not bound at all |
+| `go.mod` lowered from `1.27` to `1.22` | Nothing in the code needs more, and the README already advertised 1.22 as the minimum |
+| `Config` reduced to `{ Port int }` | It advertised timeout fields the environment could not actually set; those moved to `cmd/server` |
+| `trackingWriter` added to `middleware.go` | A panic after the response had started would have appended a second status line and error envelope |
+| `percentage` evaluates `a*b/100` | Dividing first made `7% of 3` return `0.21000000000000002`; the finite guard still catches products that overflow |
 
 **Explicit non-goals** (documented in the README, not deferred): CORS middleware (dev uses the Vite
 proxy, prod is same-origin via nginx), auth, rate limiting, persistence or history, E2E tests,
