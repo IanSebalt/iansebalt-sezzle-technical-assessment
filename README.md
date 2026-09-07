@@ -1,7 +1,7 @@
 # Sezzle Calculator
 
 A full-stack calculator: a **React + TypeScript** keypad frontend consuming a **Go** backend
-microservice over REST.
+microservice over REST. Claude Code CLI was used as a tool to build and test this project.
 
 Every arithmetic result is computed by the Go service. The frontend holds keypad state — which digits
 you typed, which operator is pending — but never does the maths itself, and a unit test enforces
