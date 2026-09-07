@@ -13,7 +13,7 @@ import (
 func mapError(err error) *apierror.Error {
 	switch {
 	case errors.Is(err, calculator.ErrUnsupportedOperation):
-		return apierror.UnsupportedOperation(supportedOperations())
+		return apierror.UnsupportedOperation(supportedOperations)
 	case errors.Is(err, calculator.ErrDivisionByZero):
 		return apierror.DivisionByZero()
 	case errors.Is(err, calculator.ErrNegativeSquareRoot):
@@ -25,7 +25,10 @@ func mapError(err error) *apierror.Error {
 	}
 }
 
-func supportedOperations() string {
+// The set is fixed at build time, so it is joined once rather than on every rejected request.
+var supportedOperations = joinSupportedOperations()
+
+func joinSupportedOperations() string {
 	operations := calculator.Supported()
 	names := make([]string, len(operations))
 	for i, op := range operations {

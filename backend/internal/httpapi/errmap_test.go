@@ -66,7 +66,7 @@ func TestMapErrorHidesUnrecognisedDetail(t *testing.T) {
 }
 
 func TestSupportedOperationsListsEveryOperation(t *testing.T) {
-	got := supportedOperations()
+	got := supportedOperations
 
 	for _, op := range calculator.Supported() {
 		if !strings.Contains(got, op.String()) {
