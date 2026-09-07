@@ -89,6 +89,15 @@ describe('calculate', () => {
     }
   })
 
+  it('rejects a success that is not a JSON object at all', async () => {
+    stubTextResponse('<html>a proxy served this instead</html>', 200)
+
+    const error = await calculate({ operation: 'add', a: 1, b: 2 }).catch((cause) => cause)
+
+    expect(error).toBeInstanceOf(ApiError)
+    expect(error.code).toBe(CLIENT_ERROR_CODES.unreadable)
+  })
+
   it('accepts a unary response with no b at all', async () => {
     stubJsonResponse({ operation: 'sqrt', a: 9, result: 3 })
 

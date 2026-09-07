@@ -134,12 +134,12 @@ branching and `message` is a finished sentence the UI shows verbatim.
 ## Tests and coverage
 
 ```bash
-make test        # 50 Go test functions, 89 frontend tests
+make test        # 55 Go test functions, 105 frontend tests
 make coverage
 ```
 
-Backend **97.2%** of statements (100% in every package except the `main()` entrypoint);
-frontend **100%** statements / functions / lines, 99.13% branches. Figures, the exact gaps, and why
+Backend **97.4%** of statements (100% in every package except the `main()` entrypoint);
+frontend **100%** statements / functions / lines, 99.22% branches. Figures, the exact gaps, and why
 they are gaps: **[`docs/coverage.md`](docs/coverage.md)**.
 
 ## Design decisions
