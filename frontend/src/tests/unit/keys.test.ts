@@ -50,7 +50,7 @@ describe('key definitions', () => {
   it('binds every stroke the app documents', () => {
     const documented = [
       '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.',
-      '+', '-', '*', 'x', '/', '^', '%', 'r',
+      '+', '-', '*', 'x', 'X', '/', '^', '%', 'r', 'R',
       'Enter', '=', 'Backspace', 'Escape', 'c',
     ]
 

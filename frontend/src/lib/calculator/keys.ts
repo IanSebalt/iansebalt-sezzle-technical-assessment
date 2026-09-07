@@ -15,7 +15,7 @@ export const KEY_DEFINITIONS: readonly KeyDefinition[] = [
   { id: '4', label: '4', ariaLabel: 'Four', variant: 'digit', keyboard: ['4'] },
   { id: '5', label: '5', ariaLabel: 'Five', variant: 'digit', keyboard: ['5'] },
   { id: '6', label: '6', ariaLabel: 'Six', variant: 'digit', keyboard: ['6'] },
-  { id: 'multiply', label: '×', ariaLabel: 'Multiply', variant: 'operator', keyboard: ['*', 'x'] },
+  { id: 'multiply', label: '×', ariaLabel: 'Multiply', variant: 'operator', keyboard: ['*', 'x', 'X'] },
 
   { id: '1', label: '1', ariaLabel: 'One', variant: 'digit', keyboard: ['1'] },
   { id: '2', label: '2', ariaLabel: 'Two', variant: 'digit', keyboard: ['2'] },

@@ -20,7 +20,7 @@ function sizeFor(value: string): 'normal' | 'medium' | 'small' {
 export function Display({ expression, value, busy }: DisplayProps) {
   return (
     <div className={styles.display}>
-      <p className={styles.expression}>{expression || ' '}</p>
+      <p className={styles.expression}>{expression}</p>
       <output
         className={styles.value}
         data-size={sizeFor(value)}
