@@ -64,6 +64,7 @@ function press(state: KeypadState, key: KeyId): KeypadState {
   if (state.pending !== null) return state
 
   if (isDigit(key)) return appendDigit(state, key)
+  if (key === 'backspace') return deleteLastDigit(state)
   if (key === 'decimal') return appendDecimal(state)
   if (key === 'equals') return submitExpression(state)
   if (key === 'sqrt') return submitSquareRoot(state)
@@ -85,6 +86,33 @@ function appendDigit(state: KeypadState, digit: DigitKeyId): KeypadState {
     entryValue: null,
     entryStarted: true,
     showsResult: false,
+    error: null,
+    constraint: null,
+  }
+}
+
+/** A result cannot be edited digit by digit, so backspacing one clears the entry instead. */
+function deleteLastDigit(state: KeypadState): KeypadState {
+  if (state.showsResult) {
+    return {
+      ...state,
+      entry: '0',
+      entryValue: null,
+      entryStarted: false,
+      showsResult: false,
+      error: null,
+      constraint: null,
+    }
+  }
+
+  const trimmed = state.entry.slice(0, -1)
+  const entry = trimmed === '' ? '0' : trimmed
+
+  return {
+    ...state,
+    entry,
+    entryValue: null,
+    entryStarted: entry !== '0',
     error: null,
     constraint: null,
   }

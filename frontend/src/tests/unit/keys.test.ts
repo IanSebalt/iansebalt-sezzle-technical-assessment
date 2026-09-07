@@ -25,8 +25,11 @@ describe('key definitions', () => {
     }
   })
 
-  it('lays the keys out in rows of four', () => {
-    expect(KEY_DEFINITIONS.length % 4).toBe(0)
+  it('lays the keys out in rows of four, with equals spanning the last row', () => {
+    const last = KEY_DEFINITIONS.at(-1)
+
+    expect(last?.id).toBe('equals')
+    expect((KEY_DEFINITIONS.length - 1) % 4).toBe(0)
   })
 
   it('binds every keyboard stroke to exactly one key', () => {
@@ -40,6 +43,7 @@ describe('key definitions', () => {
     expect(keyIdForKeyboardKey('/')).toBe('divide')
     expect(keyIdForKeyboardKey('Enter')).toBe('equals')
     expect(keyIdForKeyboardKey('Escape')).toBe('clear')
+    expect(keyIdForKeyboardKey('Backspace')).toBe('backspace')
     expect(keyIdForKeyboardKey('F5')).toBeUndefined()
   })
 

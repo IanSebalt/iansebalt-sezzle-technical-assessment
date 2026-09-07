@@ -43,6 +43,52 @@ describe('entering a number', () => {
   })
 })
 
+describe('correcting a mistyped number', () => {
+  it('drops the last digit', () => {
+    expect(pressAll(['1', '2', '3', 'backspace']).entry).toBe('12')
+  })
+
+  it('drops a decimal point like any other character', () => {
+    expect(pressAll(['1', 'decimal', 'backspace']).entry).toBe('1')
+  })
+
+  it('falls back to zero once the last character goes', () => {
+    const emptied = pressAll(['7', 'backspace'])
+
+    expect(emptied.entry).toBe('0')
+    expect(emptied.entryStarted).toBe(false)
+  })
+
+  it('leaves an already empty entry alone', () => {
+    expect(pressAll(['backspace']).entry).toBe('0')
+  })
+
+  it('re-opens the expression so equals waits for a fresh operand', () => {
+    const state = pressAll(['1', '2', 'add', '3', 'backspace'])
+
+    expect(state.operandA).toBe(12)
+    expect(state.operation).toBe('add')
+    expect(pressAll(['equals'], state).pending).toBeNull()
+  })
+
+  it('clears a result rather than editing its digits', () => {
+    const result = resolve(pressAll(['1', '0', 'divide', '4', 'equals']), 2.5)
+    const backspaced = pressAll(['backspace'], result)
+
+    expect(backspaced.entry).toBe('0')
+    expect(backspaced.entryValue).toBeNull()
+    expect(backspaced.showsResult).toBe(false)
+  })
+
+  it('clears the digit limit warning', () => {
+    const digits = Array.from({ length: MAX_ENTRY_DIGITS + 1 }, () => '9' as KeyId)
+    const overLimit = pressAll(digits)
+
+    expect(overLimit.constraint).toBe(MAX_ENTRY_MESSAGE)
+    expect(pressAll(['backspace'], overLimit).constraint).toBeNull()
+  })
+})
+
 describe('building an expression', () => {
   it('stores the operand and the pending operator', () => {
     const state = pressAll(['1', '2', 'add'])

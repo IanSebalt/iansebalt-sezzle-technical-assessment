@@ -5,7 +5,7 @@ export type DigitKeyId = '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '
 /** Operations that take a second operand; `sqrt` is the only unary one. */
 export type BinaryOperation = Exclude<Operation, 'sqrt'>
 
-export type KeyId = DigitKeyId | 'decimal' | 'clear' | 'equals' | Operation
+export type KeyId = DigitKeyId | 'decimal' | 'clear' | 'backspace' | 'equals' | Operation
 
 export type KeyVariant = 'digit' | 'operator' | 'action' | 'accent'
 

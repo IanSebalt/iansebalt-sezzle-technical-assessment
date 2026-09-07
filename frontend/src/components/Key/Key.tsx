@@ -12,6 +12,7 @@ export function Key({ definition, disabled, onPress }: KeyProps) {
     <button
       type="button"
       className={[styles.key, styles[definition.variant]].filter(Boolean).join(' ')}
+      data-key={definition.id}
       aria-label={definition.ariaLabel}
       disabled={disabled}
       onClick={() => onPress(definition.id)}

@@ -166,6 +166,17 @@ describe('Calculator input constraints', () => {
     expect(decimal).toBeDisabled()
   })
 
+  it('lets a mistyped digit be corrected with the backspace key', async () => {
+    stubCalculatorApi()
+    render(<Calculator />)
+
+    await pressKeys(['One', 'Two', 'Three', 'Delete last digit'])
+    expect(display()).toHaveTextContent(/^12$/)
+
+    await pressKeys(['Four', 'Add', 'One', 'Equals'])
+    await waitFor(() => expect(display()).toHaveTextContent('125'))
+  })
+
   it('explains the digit limit rather than ignoring the press', async () => {
     stubCalculatorApi()
     render(<Calculator />)
@@ -185,6 +196,15 @@ describe('Calculator keyboard support', () => {
     await userEvent.keyboard('12+3{Enter}')
 
     await waitFor(() => expect(display()).toHaveTextContent('15'))
+  })
+
+  it('corrects a digit with the Backspace key', async () => {
+    stubCalculatorApi()
+    render(<Calculator />)
+
+    await userEvent.keyboard('123{Backspace}')
+
+    expect(display()).toHaveTextContent(/^12$/)
   })
 
   it('clears on Escape', async () => {
