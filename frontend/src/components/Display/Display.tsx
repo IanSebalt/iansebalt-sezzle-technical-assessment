@@ -6,11 +6,23 @@ interface DisplayProps {
   busy: boolean
 }
 
+/** Long results (exponential notation, in particular) are stepped down so they stay fully visible. */
+function sizeFor(value: string): 'normal' | 'medium' | 'small' {
+  if (value.length > 14) return 'small'
+  if (value.length > 10) return 'medium'
+  return 'normal'
+}
+
 export function Display({ expression, value, busy }: DisplayProps) {
   return (
     <div className={styles.display}>
-      <p className={styles.expression}>{expression || ' '}</p>
-      <output className={styles.value} aria-live="polite" aria-busy={busy}>
+      <p className={styles.expression}>{expression || ' '}</p>
+      <output
+        className={styles.value}
+        data-size={sizeFor(value)}
+        aria-live="polite"
+        aria-busy={busy}
+      >
         {value}
       </output>
     </div>

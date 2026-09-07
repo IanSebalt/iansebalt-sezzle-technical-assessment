@@ -27,6 +27,14 @@
   white-space: nowrap;
 }
 
+.value[data-size='medium'] {
+  font-size: 1.7rem;
+}
+
+.value[data-size='small'] {
+  font-size: 1.25rem;
+}
+
 .value[aria-busy='true'] {
   opacity: 0.55;
 }
@@ -34,5 +42,13 @@
 @media (width <= 24rem) {
   .value {
     font-size: 1.75rem;
+  }
+
+  .value[data-size='medium'] {
+    font-size: 1.4rem;
+  }
+
+  .value[data-size='small'] {
+    font-size: 1.05rem;
   }
 }

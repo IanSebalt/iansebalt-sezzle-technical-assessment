@@ -23,6 +23,17 @@ describe('Display', () => {
     expect(screen.getByRole('status')).toHaveAttribute('aria-live', 'polite')
   })
 
+  it('steps the type down so a long result stays fully visible', () => {
+    const { rerender } = render(<Display expression="" value="123" busy={false} />)
+    expect(screen.getByRole('status')).toHaveAttribute('data-size', 'normal')
+
+    rerender(<Display expression="" value="12345678901" busy={false} />)
+    expect(screen.getByRole('status')).toHaveAttribute('data-size', 'medium')
+
+    rerender(<Display expression="" value="3.6972963765e+197" busy={false} />)
+    expect(screen.getByRole('status')).toHaveAttribute('data-size', 'small')
+  })
+
   it('marks itself busy while a calculation is in flight', () => {
     const { rerender } = render(<Display expression="" value="7" busy={false} />)
     expect(screen.getByRole('status')).toHaveAttribute('aria-busy', 'false')
