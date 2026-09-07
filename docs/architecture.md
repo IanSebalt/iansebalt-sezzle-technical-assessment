@@ -84,15 +84,20 @@ components/  ──▶  hooks/  ──▶  lib/api        (fetch + typed contrac
 The UI computes nothing, so the reducer never evaluates — it *builds a request*:
 
 ```
-digits      ──▶ entry
-operator    ──▶ operandA := entry, operation := operator, await the second operand
-digits      ──▶ entry
-'='         ──▶ pending = { operation, a: operandA, b: entry }
+digits      ──▶ entry, entryValue := null      (the typed digits are the value)
+operator    ──▶ operandA := currentOperand(), operation := operator, await the second operand
+digits      ──▶ entry, entryValue := null
+'='         ──▶ pending = { operation, a: operandA, b: currentOperand() }
                                     │
                           useCalculator performs the call
                                     │
-resolved    ──▶ entry := formatted result
+resolved    ──▶ entry := formatted result, entryValue := the exact result
 ```
+
+`currentOperand()` reads `entryValue` when the number on screen came from the server, and falls
+back to parsing `entry` while the user is typing. That split matters: `entry` is rounded to 12
+significant digits for display, so re-parsing it would feed that rounding into the next request and
+make `10 ÷ 3 = × 3 =` return `9.99999999999`.
 
 Three rules make it predictable:
 

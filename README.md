@@ -184,8 +184,8 @@ covered `sqrt` or `power` and the guarantee would have been misleading. Non-fini
 
 These were not specified in the brief and were decided deliberately:
 
-- **`percentage` means "a% of b"** — `(a/100)*b`. The term is genuinely ambiguous, so the definition
-  is pinned here, in the API docs, and in a hint under the keypad.
+- **`percentage` means "a% of b"** — `(a × b) ÷ 100`. The term is genuinely ambiguous, so the
+  definition is pinned here, in the API docs, and in a hint under the keypad.
 - **The keypad does one binary operation per `=`.** No chaining and no operator precedence, so
   `2 + 3 × 4` is not an expression the UI can build. This keeps every result server-computed and the
   reducer small; an expression parser would have meant either a new endpoint or arithmetic in the
