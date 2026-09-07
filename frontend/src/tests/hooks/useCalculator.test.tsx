@@ -109,6 +109,32 @@ describe('useCalculator', () => {
     expect(JSON.parse(String(init.body))).toEqual({ operation: 'sqrt', a: 81 })
   })
 
+  it('stays quiet when a request is aborted rather than reporting a failure', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        (_url: string, init: RequestInit) =>
+          new Promise<Response>((_resolve, reject) => {
+            init.signal?.addEventListener('abort', () => {
+              reject(new DOMException('The operation was aborted.', 'AbortError'))
+            })
+          }),
+      ),
+    )
+
+    const view = renderHook(() => useCalculator())
+
+    pressKeys(view, ['1', 'add', '1', 'equals'])
+    expect(view.result.current.isCalculating).toBe(true)
+
+    await act(async () => {
+      view.result.current.press('clear')
+    })
+
+    expect(view.result.current.state.error).toBeNull()
+    expect(view.result.current.state.entry).toBe('0')
+  })
+
   it('ignores an answer that arrives after its request was abandoned', async () => {
     const abandoned = deferred<Response>()
     const current = deferred<Response>()

@@ -1,0 +1,54 @@
+.key {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--key-min-size);
+  padding: var(--space-sm);
+  border: 1px solid var(--color-key-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-key-bg);
+  color: var(--color-key-text);
+  font-size: 1.25rem;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  transition: background-color 120ms ease, transform 80ms ease;
+}
+
+.key:hover:not(:disabled) {
+  background-color: var(--color-key-hover);
+}
+
+.key:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.key:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.operator {
+  border-color: var(--color-operator-border);
+  background-color: var(--color-operator-bg);
+  color: var(--color-operator-text);
+  font-weight: 600;
+}
+
+.operator:hover:not(:disabled) {
+  background-color: var(--color-operator-hover);
+}
+
+.action {
+  font-weight: 600;
+}
+
+.accent {
+  border-color: transparent;
+  background-color: var(--color-accent-bg);
+  color: var(--color-accent-text);
+  font-weight: 700;
+}
+
+.accent:hover:not(:disabled) {
+  background-color: var(--color-accent-hover);
+}

@@ -1,0 +1,44 @@
+.page {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-lg);
+  align-items: center;
+  min-height: 100vh;
+  padding: var(--space-xl) var(--space-md);
+}
+
+.header {
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.subtitle {
+  margin: var(--space-xs) 0 0;
+  color: var(--color-text-muted);
+  font-size: 0.9rem;
+}
+
+.footer {
+  max-width: 26rem;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
+
+.footer p {
+  margin: 0;
+}
+
+.footer kbd {
+  padding: 0.1em 0.35em;
+  border: 1px solid var(--color-card-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-card);
+  font-family: var(--font-numeric);
+  font-size: 0.95em;
+}
