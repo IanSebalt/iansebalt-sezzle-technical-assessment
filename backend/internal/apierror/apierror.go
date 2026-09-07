@@ -9,6 +9,8 @@ type Error struct {
 	Message string
 }
 
+// Error makes *Error satisfy the error interface, so it can be logged, wrapped and matched with
+// errors.Is/As like any other failure rather than needing special handling at every call site.
 func (e *Error) Error() string {
 	return e.Code + ": " + e.Message
 }

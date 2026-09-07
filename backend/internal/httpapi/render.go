@@ -28,7 +28,7 @@ func (a *api) writeJSON(w http.ResponseWriter, status int, payload any) {
 
 func (a *api) writeError(w http.ResponseWriter, apiErr *apierror.Error) {
 	if apiErr.Status >= http.StatusInternalServerError {
-		a.logger.Error("request failed", "code", apiErr.Code, "status", apiErr.Status)
+		a.logger.Error("request failed", "error", apiErr, "status", apiErr.Status)
 	}
 
 	a.writeJSON(w, apiErr.Status, errorBody{

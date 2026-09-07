@@ -59,6 +59,10 @@ func TestWriteError_LogsServerFaultsOnly(t *testing.T) {
 			if gotLogged := logged.Len() > 0; gotLogged != tt.wantLogged {
 				t.Errorf("logged = %v, want %v (log: %q)", gotLogged, tt.wantLogged, logged.String())
 			}
+			// A server fault should be diagnosable from the log line alone.
+			if tt.wantLogged && !strings.Contains(logged.String(), tt.apiErr.Error()) {
+				t.Errorf("log %q does not carry the failure %q", logged.String(), tt.apiErr.Error())
+			}
 		})
 	}
 }
