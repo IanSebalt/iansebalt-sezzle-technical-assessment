@@ -1,5 +1,6 @@
 import { ApiError, isAbortError } from './errors'
-import type { ApiErrorBody, CalculateRequest, CalculateResponse } from './types'
+import { OPERATIONS } from './types'
+import type { ApiErrorBody, CalculateRequest, CalculateResponse, Operation } from './types'
 
 const CALCULATE_ENDPOINT = '/api/v1/calculate'
 
@@ -62,7 +63,23 @@ function isApiErrorBody(body: unknown): body is ApiErrorBody {
 }
 
 function isCalculateResponse(body: unknown): body is CalculateResponse {
-  return isRecord(body) && typeof body.result === 'number' && Number.isFinite(body.result)
+  if (!isRecord(body)) return false
+
+  return (
+    isOperation(body.operation) &&
+    isFiniteNumber(body.a) &&
+    // b is absent for unary operations, so it is optional rather than merely nullable.
+    (body.b === undefined || isFiniteNumber(body.b)) &&
+    isFiniteNumber(body.result)
+  )
+}
+
+function isOperation(value: unknown): value is Operation {
+  return typeof value === 'string' && (OPERATIONS as readonly string[]).includes(value)
+}
+
+function isFiniteNumber(value: unknown): value is number {
+  return typeof value === 'number' && Number.isFinite(value)
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

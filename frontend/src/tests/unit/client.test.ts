@@ -70,12 +70,33 @@ describe('calculate', () => {
     expect(error.code).toBe(CLIENT_ERROR_CODES.unreadable)
   })
 
-  it('rejects a successful response whose result is not a usable number', async () => {
-    stubJsonResponse({ operation: 'add', a: 1, b: 2, result: 'three' })
+  it('rejects a successful response that does not match the documented shape', async () => {
+    const malformed = [
+      { name: 'result is not a number', body: { operation: 'add', a: 1, b: 2, result: 'three' } },
+      { name: 'result is missing', body: { operation: 'add', a: 1, b: 2 } },
+      { name: 'operation is unknown', body: { operation: 'modulo', a: 1, b: 2, result: 1 } },
+      { name: 'operation is missing', body: { a: 1, b: 2, result: 3 } },
+      { name: 'a is not a number', body: { operation: 'add', a: 'one', b: 2, result: 3 } },
+      { name: 'b is null rather than absent', body: { operation: 'sqrt', a: 9, b: null, result: 3 } },
+    ]
 
-    const error = await calculate({ operation: 'add', a: 1, b: 2 }).catch((cause) => cause)
+    for (const { name, body } of malformed) {
+      stubJsonResponse(body)
 
-    expect(error.code).toBe(CLIENT_ERROR_CODES.unreadable)
+      const error = await calculate({ operation: 'add', a: 1, b: 2 }).catch((cause) => cause)
+
+      expect(error.code, name).toBe(CLIENT_ERROR_CODES.unreadable)
+    }
+  })
+
+  it('accepts a unary response with no b at all', async () => {
+    stubJsonResponse({ operation: 'sqrt', a: 9, result: 3 })
+
+    await expect(calculate({ operation: 'sqrt', a: 9 })).resolves.toEqual({
+      operation: 'sqrt',
+      a: 9,
+      result: 3,
+    })
   })
 
   it('reports the service as unreachable when a proxy cannot reach it', async () => {
