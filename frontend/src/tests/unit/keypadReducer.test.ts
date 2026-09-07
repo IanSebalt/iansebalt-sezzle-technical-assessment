@@ -147,11 +147,13 @@ describe('working with a result', () => {
     expect(state.operation).toBeNull()
   })
 
+  // 2.5 survives formatResult unchanged, so it cannot tell a rounded operand from an exact one.
+  // A non-terminating value is what makes this test meaningful.
   it('reuses the result as the next operand', () => {
-    const result = resolve(pressAll(['1', '0', 'divide', '4', 'equals']), 2.5)
+    const result = resolve(pressAll(['1', '0', 'divide', '3', 'equals']), 10 / 3)
     const next = pressAll(['add', '5', 'equals'], result)
 
-    expect(next.pending?.request).toEqual({ operation: 'add', a: 2.5, b: 5 })
+    expect(next.pending?.request).toEqual({ operation: 'add', a: 10 / 3, b: 5 })
   })
 
   it('chains the exact result rather than the rounded value on screen', () => {
