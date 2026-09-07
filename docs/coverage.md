@@ -37,12 +37,12 @@ cd backend && go tool cover -html=coverage.out    # annotated source
 
 | Metric | Coverage |
 |---|---|
-| Statements | **100%** (150/150) |
+| Statements | **100%** (152/152) |
 | Functions | **100%** (49/49) |
-| Lines | **100%** (121/121) |
-| Branches | **99.11%** (112/113) |
+| Lines | **100%** (123/123) |
+| Branches | **99.13%** (114/115) |
 
-88 tests across 11 files: pure units for the reducer, formatting and key definitions; the API
+89 tests across 11 files: pure units for the reducer, formatting and key definitions; the API
 client; both hooks; and component tests up to a full integration test that drives the real component
 tree against a stub shaped like the Go service.
 
@@ -60,4 +60,5 @@ cd frontend && npm run test:coverage
 CSS, the Vite and nginx configuration, and the Dockerfiles carry no unit tests. These were verified
 by running the stack: `docker compose up --build`, then exercising the UI in a browser at desktop
 and 375px widths, in light and dark themes, by mouse and by keyboard alone, including the
-division-by-zero, negative-square-root and overflow paths.
+division-by-zero, negative-square-root and overflow paths, and with the backend container stopped
+mid-session to confirm the unreachable-service message and that the keypad recovers.

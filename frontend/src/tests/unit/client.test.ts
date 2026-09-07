@@ -101,6 +101,15 @@ describe('calculate', () => {
     )
   })
 
+  it('reports the service as unreachable when the request times out', async () => {
+    stubRejection(new DOMException('The operation timed out.', 'TimeoutError'))
+
+    const error = await calculate({ operation: 'add', a: 1, b: 2 }).catch((cause) => cause)
+
+    expect(error).toBeInstanceOf(ApiError)
+    expect(error.code).toBe(CLIENT_ERROR_CODES.network)
+  })
+
   it('propagates an abort untouched so the caller can ignore it', async () => {
     const abort = new DOMException('The operation was aborted.', 'AbortError')
     stubRejection(abort)

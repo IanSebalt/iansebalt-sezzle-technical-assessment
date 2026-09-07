@@ -70,7 +70,9 @@ components/  ──▶  hooks/  ──▶  lib/api        (fetch + typed contrac
   gateway case matters because a proxy sits in front of the API in both environments — with the
   backend down, the browser receives a 502 from Vite or nginx rather than a failed request, so
   treating it as an unreadable response would have told the user the wrong thing. Anything else
-  unparseable becomes *"Unexpected response from the server."*
+  unparseable becomes *"Unexpected response from the server."* The client also gives up after 10
+  seconds, and nginx after 5 — left at their defaults, nginx spends about 40 seconds retrying a
+  backend that is simply not there, and the keypad stays disabled for all of it.
 - **`hooks/useCalculator`** joins the two: it runs the reducer, and when the reducer produces a
   `pending` request it performs the call and dispatches the answer back.
 - **`components/`** render state and forward presses. `Calculator` is the only component that holds

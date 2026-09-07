@@ -339,6 +339,7 @@ Each was left open deliberately and settled at the point the roadmap named.
 | Long results overflowing the display | `99^99` clipped its own exponent. The display now steps its type size down by value length (`data-size` attribute, asserted in a test) |
 | `cmd/server` test coverage | The plan left the entrypoint untested. It now has a test that boots the real server on an ephemeral port, calls it, sends `SIGTERM` and asserts a clean shutdown |
 | A downed backend behind a proxy | Found by killing the backend with the page open: Vite (and nginx) answer **502**, so the browser gets a response rather than a failed fetch, and the user was told "Unexpected response from the server." 502/503/504 now map to "Cannot reach the calculator service." |
+| How long a dead backend takes to report | With default timeouts nginx took **39s** to return its 502, leaving the keypad disabled throughout. `proxy_connect_timeout 5s` plus a 10s client deadline bring it to ~5s, and the keypad recovers |
 
 **Explicit non-goals** (documented in the README, not deferred): CORS middleware (dev uses the Vite
 proxy, prod is same-origin via nginx), auth, rate limiting, persistence or history, E2E tests,
