@@ -56,6 +56,8 @@ Port 9080 already taken? `make run-backend PORT=9090`, and adjust `backendUrl` i
 
 ## Everything you can run
 
+The frontend targets need dependencies installed first (`cd frontend && npm install`).
+
 ```bash
 make help          # list every target
 make test          # Go + Vitest suites
