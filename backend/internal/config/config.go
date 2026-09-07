@@ -21,7 +21,6 @@ type Config struct {
 	Port int
 }
 
-// Address renders the listen address for net/http.
 func (c Config) Address() string {
 	return ":" + strconv.Itoa(c.Port)
 }

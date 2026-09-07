@@ -58,6 +58,8 @@ export function keypadReducer(state: KeypadState, action: KeypadAction): KeypadS
 }
 
 function press(state: KeypadState, key: KeyId): KeypadState {
+  // Clear is handled before the in-flight guard below so it can interrupt a request. Carrying
+  // nextRequestId forward means the abandoned reply still fails the id check when it lands.
   if (key === 'clear') return { ...initialState, nextRequestId: state.nextRequestId }
 
   // A calculation is in flight; only clearing may interrupt it.

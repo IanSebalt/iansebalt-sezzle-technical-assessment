@@ -26,6 +26,7 @@ func apply(op Operation, a, b float64) (float64, error) {
 	case Multiply:
 		return a * b, nil
 	case Divide:
+		// -0.0 == 0 in Go, so this rejects a negative zero divisor too.
 		if b == 0 {
 			return 0, ErrDivisionByZero
 		}

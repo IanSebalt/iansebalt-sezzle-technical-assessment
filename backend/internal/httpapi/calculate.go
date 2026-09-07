@@ -25,6 +25,7 @@ func (a *api) calculate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// b stays 0 for unary operations, which Evaluate ignores.
 	var b float64
 	if req.B != nil {
 		b = *req.B
@@ -41,7 +42,8 @@ func (a *api) calculate(w http.ResponseWriter, r *http.Request) {
 		A:         *req.A,
 		Result:    result,
 	}
-	// Unary operations echo only the operand they actually used.
+	// b is left out rather than echoed as null, so the response states exactly which operands the
+	// result came from.
 	if operation.Arity() == 2 {
 		response.B = req.B
 	}

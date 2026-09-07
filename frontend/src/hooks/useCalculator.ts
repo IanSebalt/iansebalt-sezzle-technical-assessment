@@ -25,6 +25,7 @@ export function useCalculator() {
       })
 
     return () => controller.abort()
+    // The reducer builds a fresh pending object per request, so identity is what re-runs this.
   }, [pending])
 
   const press = useCallback((key: KeyId) => dispatch({ type: 'press', key }), [])

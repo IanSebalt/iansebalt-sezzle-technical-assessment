@@ -1,4 +1,7 @@
-/** Digits a single operand may hold before the keypad stops accepting more. */
+/**
+ * float64 carries roughly 15-17 significant decimal digits, so past 15 the extra keystrokes buy
+ * noise rather than precision and the keypad stops accepting them.
+ */
 export const MAX_ENTRY_DIGITS = 15
 
 export const MAX_ENTRY_MESSAGE = `Maximum ${MAX_ENTRY_DIGITS} digits.`

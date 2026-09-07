@@ -11,6 +11,7 @@ export function Key({ definition, disabled, onPress }: KeyProps) {
   return (
     <button
       type="button"
+      // styles[variant] is undefined wherever CSS Modules are not resolved, such as under Vitest.
       className={[styles.key, styles[definition.variant]].filter(Boolean).join(' ')}
       data-key={definition.id}
       aria-label={definition.ariaLabel}
