@@ -28,6 +28,12 @@ export interface PendingRequest {
 export interface KeypadState {
   /** The number the display shows. Only ever built from typed digits or a server result. */
   entry: string
+  /**
+   * The exact value behind `entry` when the server produced it. `entry` is rounded for display, so
+   * re-parsing it would feed that rounding into the next request. Null while the user is typing,
+   * because then `entry` itself is the source of truth.
+   */
+  entryValue: number | null
   /** False between pressing an operator and typing the operand that follows it. */
   entryStarted: boolean
   operandA: number | null

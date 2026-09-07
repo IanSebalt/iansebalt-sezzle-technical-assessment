@@ -10,6 +10,7 @@ import type {
 
 export const initialState: KeypadState = {
   entry: '0',
+  entryValue: null,
   entryStarted: false,
   operandA: null,
   operation: null,
@@ -37,6 +38,7 @@ export function keypadReducer(state: KeypadState, action: KeypadAction): KeypadS
       return {
         ...state,
         entry: formatResult(action.result),
+        entryValue: action.result,
         entryStarted: !clearsExpression,
         operandA: clearsExpression ? null : state.operandA,
         operation: clearsExpression ? null : state.operation,
@@ -77,16 +79,39 @@ function appendDigit(state: KeypadState, digit: DigitKeyId): KeypadState {
     return { ...state, constraint: MAX_ENTRY_MESSAGE }
   }
 
-  return { ...state, entry, entryStarted: true, showsResult: false, error: null, constraint: null }
+  return {
+    ...state,
+    entry,
+    entryValue: null,
+    entryStarted: true,
+    showsResult: false,
+    error: null,
+    constraint: null,
+  }
 }
 
 function appendDecimal(state: KeypadState): KeypadState {
   if (state.showsResult) {
-    return { ...state, entry: '0.', entryStarted: true, showsResult: false, error: null, constraint: null }
+    return {
+      ...state,
+      entry: '0.',
+      entryValue: null,
+      entryStarted: true,
+      showsResult: false,
+      error: null,
+      constraint: null,
+    }
   }
   if (state.entry.includes('.')) return state
 
-  return { ...state, entry: `${state.entry}.`, entryStarted: true, error: null, constraint: null }
+  return {
+    ...state,
+    entry: `${state.entry}.`,
+    entryValue: null,
+    entryStarted: true,
+    error: null,
+    constraint: null,
+  }
 }
 
 /** The operator may be changed at any point before `=`; only the first press captures operand A. */
@@ -97,9 +122,10 @@ function setOperation(state: KeypadState, operation: BinaryOperation): KeypadSta
 
   return {
     ...state,
-    operandA: Number(state.entry),
+    operandA: currentOperand(state),
     operation,
     entry: '0',
+    entryValue: null,
     entryStarted: false,
     showsResult: false,
     error: null,
@@ -113,12 +139,12 @@ function submitExpression(state: KeypadState): KeypadState {
   return withPendingRequest(state, {
     operation: state.operation,
     a: state.operandA,
-    b: Number(state.entry),
+    b: currentOperand(state),
   }, true)
 }
 
 function submitSquareRoot(state: KeypadState): KeypadState {
-  return withPendingRequest(state, { operation: 'sqrt', a: Number(state.entry) }, false)
+  return withPendingRequest(state, { operation: 'sqrt', a: currentOperand(state) }, false)
 }
 
 function withPendingRequest(
@@ -133,6 +159,11 @@ function withPendingRequest(
     pending: { id: state.nextRequestId, request, clearsExpression },
     nextRequestId: state.nextRequestId + 1,
   }
+}
+
+/** Prefers the server's exact value over the rounded string the display shows. */
+function currentOperand(state: KeypadState): number {
+  return state.entryValue ?? Number(state.entry)
 }
 
 function isDigit(key: KeyId): key is DigitKeyId {

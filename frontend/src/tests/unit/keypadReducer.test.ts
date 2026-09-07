@@ -108,6 +108,35 @@ describe('working with a result', () => {
     expect(next.pending?.request).toEqual({ operation: 'add', a: 2.5, b: 5 })
   })
 
+  it('chains the exact result rather than the rounded value on screen', () => {
+    const divided = resolve(pressAll(['1', '0', 'divide', '3', 'equals']), 10 / 3)
+
+    expect(divided.entry).toBe('3.33333333333')
+    expect(divided.entryValue).toBe(10 / 3)
+
+    const chained = pressAll(['multiply', '3', 'equals'], divided)
+
+    expect(chained.pending?.request.a).toBe(10 / 3)
+    expect(chained.pending?.request.a).not.toBe(Number(divided.entry))
+  })
+
+  it('takes the square root of the exact result, not of the rounded display', () => {
+    const divided = resolve(pressAll(['1', '0', 'divide', '3', 'equals']), 10 / 3)
+
+    expect(pressAll(['sqrt'], divided).pending?.request).toEqual({
+      operation: 'sqrt',
+      a: 10 / 3,
+    })
+  })
+
+  it('forgets the exact value as soon as the user types over the result', () => {
+    const divided = resolve(pressAll(['1', '0', 'divide', '3', 'equals']), 10 / 3)
+    const typed = pressAll(['7'], divided)
+
+    expect(typed.entryValue).toBeNull()
+    expect(pressAll(['add', '1', 'equals'], typed).pending?.request.a).toBe(7)
+  })
+
   it('starts a fresh decimal number when a decimal point follows a result', () => {
     const result = resolve(pressAll(['1', '0', 'divide', '4', 'equals']), 2.5)
     const next = pressAll(['decimal', '5'], result)
