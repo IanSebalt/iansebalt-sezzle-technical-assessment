@@ -1,3 +1,3 @@
 module github.com/iansebalt/sezzle-calculator
 
-go 1.27
+go 1.22

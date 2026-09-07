@@ -18,7 +18,7 @@ that. Built against the brief in [`docs/main-task/main-task.txt`](docs/main-task
 
 | Tool | Version used | Needed for |
 |---|---|---|
-| Go | 1.27.1 | backend |
+| Go | 1.22 or newer (1.27.1 used here) | backend |
 | Node.js | 24.14.0 (npm 11.9.0) | frontend |
 | Docker + Compose | 29.7.2 / v5.5.0 | optional containerised run |
 
